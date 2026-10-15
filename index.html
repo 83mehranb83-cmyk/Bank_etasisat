@@ -25,6 +25,25 @@ const C={
 "مصالح و متعلقات":[]
 };
 const $=id=>document.getElementById(id),cats=Object.keys(C),fa=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);let projects=JSON.parse(localStorage.getItem('plumb_projects_v2')||'[]'),buy=JSON.parse(localStorage.getItem('plumb_buy_v2')||'[]'),catalog=JSON.parse(localStorage.getItem('plumb_custom_catalog_v1')||'[]'),sel=cats[0];
+const fiveLayerItems=[
+"لوله 16","لوله 20","لوله 25","لوله 32",
+"فوم 16","فوم 20","فوم 25","فوم 32",
+"سه راه 16 × 1/2","سه راه 20 × 16 × 1/2",
+"زانو 16 × 1/2","زانو 25 × 3/4",
+"صفحه نصب 500","صفحه نصب 280","صفحه نصب 153","صفحه نصب 100 (تک)","صفحه نصب زیر پکیج",
+"کلکتور (B6)","کلکتور (B5)","کلکتور (B4)","کلکتور (B7)","کلکتور (B8)","کلکتور (B9)","کلکتور (B10)",
+"شیر کلکتوری 16 × 1/2 کوپلی","شیر کلکتوری 20 × 1/2 کوپلی",
+"شیر زانویی 25 × 1 کوپلی","زانو روپیچ 25 × 1 کوپلی",
+"درپوش کلکتوری 1","شیر هواگیری کامل 1",
+"جعبه کلکتور 65×45","جعبه کلکتور 45×45","جعبه کلکتور 90×45",
+"مغزی 1/2","مغزی تبدیلی 3/4 × 1/2","شیلنگ پیسوار 1/2","شیر دسته گازی 1/2","درپوش پلاستیکی 1/2"
+];
+if(localStorage.getItem('plumb_fivelayer_seed_v1')!=='done'){
+  const fiveCat="نیوپایپ / پنج‌لایه";
+  fiveLayerItems.forEach(name=>{if(!catalog.some(x=>x.cat===fiveCat&&x.name.toLowerCase()===name.toLowerCase()))catalog.push({id:"seed-"+Math.random().toString(36).slice(2,10)+"-"+Date.now(),cat:fiveCat,name,favorite:false})});
+  localStorage.setItem('plumb_fivelayer_seed_v1','done');
+  localStorage.setItem('plumb_custom_catalog_v1',JSON.stringify(catalog));
+}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function options(el,arr,first){el.innerHTML=(first?'<option value="">'+first+'</option>':'')+arr.map(x=>'<option>'+esc(x)+'</option>').join('')}
 function fitsFor(cat){return catalog.filter(x=>!cat||x.cat===cat).sort((a,b)=>(Number(!!b.favorite)-Number(!!a.favorite))||a.name.localeCompare(b.name,'fa'))}function sync(cat,fit){let group=$(cat).value||cats[0],arr=fitsFor(group);$(fit).innerHTML=arr.length?arr.map(x=>'<option value="'+esc(x.name)+'">'+(x.favorite?'★ ':'')+esc(x.name)+'</option>').join(''):'<option value="">اول در بانک اتصالات، موردی اضافه کن</option>'}
