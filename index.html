@@ -44,6 +44,34 @@ if(localStorage.getItem('plumb_fivelayer_seed_v1')!=='done'){
   localStorage.setItem('plumb_fivelayer_seed_v1','done');
   localStorage.setItem('plumb_custom_catalog_v1',JSON.stringify(catalog));
 }
+
+const pvcSeedKey='plumb_pvc_seed_v1';
+if(localStorage.getItem(pvcSeedKey)!=='done'){
+  const sizes=['63','90','110','125'];
+  const pvcItems=[];
+  sizes.forEach(s=>pvcItems.push('لوله پلیکا قوی '+s,'لوله پلیکا ضعیف / هواکشی '+s));
+  sizes.forEach(s=>pvcItems.push('زانو ۴۵ درجه '+s,'زانو ۹۰ درجه '+s));
+  sizes.forEach(s=>pvcItems.push('سه‌راه ۴۵ درجه '+s,'سه‌راه ۹۰ درجه '+s));
+  sizes.forEach(main=>sizes.forEach(branch=>{
+    if(main!==branch){
+      pvcItems.push('سه‌راه تبدیلی '+main+' به '+branch+'، ۴۵ درجه');
+      pvcItems.push('سه‌راه تبدیلی '+main+' به '+branch+'، ۹۰ درجه');
+    }
+  }));
+  sizes.forEach(s=>pvcItems.push('سوکت '+s));
+  for(let i=0;i<sizes.length;i++) for(let j=i+1;j<sizes.length;j++)
+    pvcItems.push('تبدیل '+sizes[j]+' به '+sizes[i]);
+  sizes.forEach(s=>pvcItems.push('دریچه بازدید '+s,'درپوش '+s));
+  pvcItems.push('سوکت تعمیری','سیفون','اتصالات جانبی سیفون');
+  const pvcCat='پلیکا (PVC)';
+  pvcItems.forEach(name=>{
+    if(!catalog.some(x=>x.cat===pvcCat&&x.name.toLowerCase()===name.toLowerCase()))
+      catalog.push({id:'pvc-seed-'+Math.random().toString(36).slice(2,10)+'-'+Date.now(),cat:pvcCat,name,favorite:false});
+  });
+  localStorage.setItem(pvcSeedKey,'done');
+  localStorage.setItem('plumb_custom_catalog_v1',JSON.stringify(catalog));
+}
+
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function options(el,arr,first){el.innerHTML=(first?'<option value="">'+first+'</option>':'')+arr.map(x=>'<option>'+esc(x)+'</option>').join('')}
 function fitsFor(cat){return catalog.filter(x=>!cat||x.cat===cat).sort((a,b)=>(Number(!!b.favorite)-Number(!!a.favorite))||a.name.localeCompare(b.name,'fa'))}function sync(cat,fit){let group=$(cat).value||cats[0],arr=fitsFor(group);$(fit).innerHTML=arr.length?arr.map(x=>'<option value="'+esc(x.name)+'">'+(x.favorite?'★ ':'')+esc(x.name)+'</option>').join(''):'<option value="">اول در بانک اتصالات، موردی اضافه کن</option>'}
