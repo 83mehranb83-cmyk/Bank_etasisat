@@ -42,6 +42,30 @@ body.dark .bottomnav .tab.active{background:#34452c;color:#d8e7c7}
 body.dark .cartbar{background:linear-gradient(120deg,#263820,#405a31)}
 @media(max-width:600px){.stat,.panel{border-radius:16px}.panel{padding:13px}.top{box-shadow:0 6px 20px #26391a22}.bottomnav .tab.active{box-shadow:inset 0 0 0 1px #c4d3b5}}
 
+
+/* Deep olive refresh: reduce bright/white surfaces */
+:root{--g:#2f4325;--g2:#496438;--m:#6d8750;--bg:#cbd7bd;--paper:#dce6d1;--line:#b3c3a5;--ink:#25321f;--muted:#58684f;--soft:#c4d4b7;--shadow:0 8px 22px #24351a18}
+body{background:linear-gradient(180deg,#c7d4b9 0%,#d3dfc7 45%,#c5d2b8 100%)}
+.top{background:linear-gradient(125deg,#1f3019,#3d582e 58%,#536f3e)}
+.stat,.panel{background:#dce6d1;border-color:#b6c6a9;box-shadow:0 7px 22px #26391b16}
+input,select{background:#cbd9bf;border-color:#aebf9f}
+.item,.project,.category{background:#d2dfc6;border-color:#b2c4a4}
+.tab{background:#c2d1b5;color:#2e4225}
+.tab.active,.primary{background:#354e29;color:#fff}
+.secondary,.pill{background:#c3d3b6;color:#334b28}
+.gold{background:#e0d5b2;color:#514327}
+.danger{background:#efd2cc;color:#833b32}
+.empty{background:#d5e0c9;border-color:#aebf9f;color:#52634a}
+.bottomnav{background:#d4e0c9;border-color:#aebf9f}
+.bottomnav .tab.active{background:#b8cba8;color:#2f4325}
+.category b,h2,.stat strong{color:#2f4925}
+input:focus,select:focus{border-color:#587a40;box-shadow:0 0 0 3px #587a4028}
+body.dark{--bg:#11170f;--paper:#1c2719;--line:#35452d;--ink:#e6eedc;--muted:#b0bea3;--soft:#2b3a24;--g:#b5c99b;--g2:#718c58;--m:#9eb985;--shadow:0 8px 24px #0005}
+body.dark{background:linear-gradient(180deg,#11170f,#192318 60%,#11170f)}
+body.dark .stat,body.dark .panel{background:#1c2719;border-color:#35452d}
+body.dark input,body.dark select,body.dark .item,body.dark .project,body.dark .category,body.dark .empty{background:#253321;color:var(--ink);border-color:#3b4d32}
+body.dark .bottomnav,body.dark .cartbar{background:#1c2719;border-color:#35452d}
+
 </style></head><body>
 <header class="top"><div class="brand"><div class="mark">ب</div><div><h1>بانک اتصالات تأسیسات</h1><p>انتخاب دقیق، فهرست مرتب</p></div><button class="themebtn" id="themeToggle" aria-label="تغییر حالت روشن و تاریک">☾</button></div></header>
 <main class="wrap"><div class="stats"><div class="stat"><small>پروژه‌های ثبت‌شده</small><strong id="sp">۰</strong></div><div class="stat"><small>قلم ثبت‌شده</small><strong id="si">۰</strong></div><div class="stat"><small>اقلام خرید</small><strong id="sb">۰</strong></div></div>
