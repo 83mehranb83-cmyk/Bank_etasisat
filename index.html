@@ -160,6 +160,50 @@ if(localStorage.getItem(galvanizedFullSeedKey)!=='done'){
   localStorage.setItem('plumb_custom_catalog_v1',JSON.stringify(catalog));
 }
 
+
+const galvanizedCompleteSeedKey='plumb_galvanized_complete_v2';
+if(localStorage.getItem(galvanizedCompleteSeedKey)!=='done'){
+  const galvanizedCat="گالوانیزه";
+  const inchSizes=[
+    {fa:"۱/۲"},{fa:"۳/۴"},{fa:"۱"},{fa:"۱ و ۱/۴"},{fa:"۱ و ۱/۲"},
+    {fa:"۲"},{fa:"۲ و ۱/۲"},{fa:"۳"},{fa:"۴"}
+  ];
+  const completeGalvItems=[];
+  const singleSizeTypes=[
+    "مغزی","مغزی بلند","بوشن","مهره ماسوره","زانو ۹۰ درجه","زانو ۴۵ درجه",
+    "سه‌راه مساوی","چهارراه مساوی","درپوش روپیچ","درپوش توپیچ","روپیچ توپیچ",
+    "چپقی","درپوش دنده‌ای","بوشن روپیچ","بوشن توپیچ"
+  ];
+  inchSizes.forEach(sz=>singleSizeTypes.forEach(type=>completeGalvItems.push(type+" "+sz.fa+" اینچ")));
+  for(let i=0;i<inchSizes.length;i++){
+    for(let j=0;j<inchSizes.length;j++){
+      if(i===j) continue;
+      const a=inchSizes[i].fa,b=inchSizes[j].fa;
+      ["مغزی تبدیلی","بوشن تبدیلی","تبدیل","سه‌راه تبدیلی","چپقی تبدیلی"].forEach(type=>completeGalvItems.push(type+" "+a+" به "+b+" اینچ"));
+      ["سه‌راه تبدیلی"].forEach(type=>{
+        completeGalvItems.push(type+" "+a+" × "+b+" × "+b+" اینچ");
+        completeGalvItems.push(type+" "+a+" × "+a+" × "+b+" اینچ");
+      });
+    }
+  }
+  for(let i=0;i<inchSizes.length;i++){
+    for(let j=0;j<inchSizes.length;j++){
+      for(let k=0;k<inchSizes.length;k++){
+        if(i===j&&j===k) continue;
+        const a=inchSizes[i].fa,b=inchSizes[j].fa,c=inchSizes[k].fa;
+        completeGalvItems.push("سه‌راه تبدیلی "+a+" × "+b+" × "+c+" اینچ");
+      }
+    }
+  }
+  completeGalvItems.forEach(name=>{
+    if(!catalog.some(x=>x.cat===galvanizedCat&&x.name.toLowerCase()===name.toLowerCase())){
+      catalog.push({id:"seed-galv-complete-"+Math.random().toString(36).slice(2,10)+"-"+Date.now(),cat:galvanizedCat,name,favorite:false});
+    }
+  });
+  localStorage.setItem(galvanizedCompleteSeedKey,'done');
+  localStorage.setItem('plumb_custom_catalog_v1',JSON.stringify(catalog));
+}
+
 const pvcSeedKey='plumb_pvc_seed_v1';
 if(localStorage.getItem(pvcSeedKey)!=='done'){
   const sizes=['63','90','110','125'];
