@@ -127,6 +127,39 @@ if(localStorage.getItem(galvanizedSeedKey)!=='done'){
   localStorage.setItem('plumb_custom_catalog_v1',JSON.stringify(catalog));
 }
 
+const galvanizedFullSeedKey='plumb_galvanized_full_4inch_v1';
+if(localStorage.getItem(galvanizedFullSeedKey)!=='done'){
+  const galvanizedCat="گالوانیزه";
+  const inchSizes=[
+    {v:"1/2",fa:"۱/۲"},{v:"3/4",fa:"۳/۴"},{v:"1",fa:"۱"},
+    {v:"1 1/4",fa:"۱ و ۱/۴"},{v:"1 1/2",fa:"۱ و ۱/۲"},
+    {v:"2",fa:"۲"},{v:"2 1/2",fa:"۲ و ۱/۲"},{v:"3",fa:"۳"},{v:"4",fa:"۴"}
+  ];
+  const fullGalvItems=[];
+  const sizedTypes=[
+    "مغزی","بوشن","مهره ماسوره","زانو ۹۰ درجه","زانو ۴۵ درجه",
+    "سه‌راه مساوی","درپوش روپیچ","درپوش توپیچ","روپیچ توپیچ","چپقی","مغزی بلند"
+  ];
+  inchSizes.forEach(sz=>sizedTypes.forEach(type=>fullGalvItems.push(type+" "+sz.fa+" اینچ")));
+  for(let i=1;i<inchSizes.length;i++){
+    for(let j=0;j<i;j++){
+      const big=inchSizes[i].fa,small=inchSizes[j].fa;
+      fullGalvItems.push("مغزی تبدیلی "+big+" به "+small+" اینچ");
+      fullGalvItems.push("بوشن تبدیلی "+big+" به "+small+" اینچ");
+      fullGalvItems.push("تبدیل "+big+" به "+small+" اینچ");
+      fullGalvItems.push("سه‌راه تبدیلی "+big+" به "+small+" اینچ");
+    }
+  }
+  inchSizes.forEach(sz=>fullGalvItems.push("سه‌راه تبدیلی "+sz.fa+" × "+sz.fa+" × "+sz.fa+" اینچ"));
+  fullGalvItems.forEach(name=>{
+    if(!catalog.some(x=>x.cat===galvanizedCat&&x.name.toLowerCase()===name.toLowerCase())){
+      catalog.push({id:"seed-galv4-"+Math.random().toString(36).slice(2,10)+"-"+Date.now(),cat:galvanizedCat,name,favorite:false});
+    }
+  });
+  localStorage.setItem(galvanizedFullSeedKey,'done');
+  localStorage.setItem('plumb_custom_catalog_v1',JSON.stringify(catalog));
+}
+
 const pvcSeedKey='plumb_pvc_seed_v1';
 if(localStorage.getItem(pvcSeedKey)!=='done'){
   const sizes=['63','90','110','125'];
