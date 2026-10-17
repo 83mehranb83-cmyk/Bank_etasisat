@@ -110,6 +110,23 @@ if(localStorage.getItem('plumb_fivelayer_seed_v1')!=='done'){
   localStorage.setItem('plumb_custom_catalog_v1',JSON.stringify(catalog));
 }
 
+const galvanizedSeedKey='plumb_galvanized_seed_v1';
+const galvanizedItems=[
+"مغزی","مغزی تبدیلی","بوشن","بوشن تبدیلی","مهره ماسوره",
+"زانو ۹۰ درجه","زانو ۴۵ درجه","سه‌راه مساوی","سه‌راه تبدیلی",
+"درپوش روپیچ","درپوش توپیچ","تبدیل","روپیچ توپیچ","چپقی","مغزی بلند"
+];
+if(localStorage.getItem(galvanizedSeedKey)!=='done'){
+  const galvanizedCat="گالوانیزه";
+  galvanizedItems.forEach(name=>{
+    if(!catalog.some(x=>x.cat===galvanizedCat&&x.name.toLowerCase()===name.toLowerCase())){
+      catalog.push({id:"seed-galv-"+Math.random().toString(36).slice(2,10)+"-"+Date.now(),cat:galvanizedCat,name,favorite:false});
+    }
+  });
+  localStorage.setItem(galvanizedSeedKey,'done');
+  localStorage.setItem('plumb_custom_catalog_v1',JSON.stringify(catalog));
+}
+
 const pvcSeedKey='plumb_pvc_seed_v1';
 if(localStorage.getItem(pvcSeedKey)!=='done'){
   const sizes=['63','90','110','125'];
