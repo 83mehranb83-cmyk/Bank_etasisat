@@ -252,7 +252,7 @@ function parseMessageLines(){
    .replace(/\s+/g,' ').trim();
  const toks=v=>clean(v).split(' ').filter(Boolean);
  const itemData=items.map(item=>({item,tokens:toks(item.name),norm:clean(item.name)}));
- messageRows=lines.map((line,i)=>{
+ const parsedRows=lines.map((line,i)=>{
    const rawNorm=normText(line);
    // Accept quantity at either the beginning or the end of a line.
    const qMatch=rawNorm.match(/(\d+(?:[.,]\d+)?)\s*(?:عدد|شاخه|بسته|متر|دست)\s*$/)
@@ -299,6 +299,16 @@ function parseMessageLines(){
    }
    return {line,cat:match?.cat||cats[0],fit:match?.name||'',qty:quantity,unit:'عدد',matched:!!match,index:i};
  });
+ // Combine repeated mentions of the exact same recognized fitting into one preview row.
+ const merged=[];
+ for(const row of parsedRows){
+     const existing=row.matched ? merged.find(x=>x.matched&&x.cat===row.cat&&x.fit===row.fit&&x.unit===row.unit) : null;
+     if(existing){
+       existing.qty=Number(existing.qty||0)+Number(row.qty||0);
+       existing.line=existing.line+'  +  '+row.line;
+     } else merged.push({...row});
+ }
+ messageRows=merged;
  renderMessagePreview();
 }
 function renderMessagePreview(){
