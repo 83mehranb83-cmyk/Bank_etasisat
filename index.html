@@ -253,14 +253,18 @@ function parseMessageLines(){
  const toks=v=>clean(v).split(' ').filter(Boolean);
  const itemData=items.map(item=>({item,tokens:toks(item.name),norm:clean(item.name)}));
  messageRows=lines.map((line,i)=>{
-   const normalized=clean(line),lineTokens=toks(line),lineSet=new Set(lineTokens);
-   // Read quantity separately, so its digits don't interfere with fitting-size matching.
-   const qMatch=normText(line).match(/(\d+(?:[.,]\d+)?)\s*(?:عدد|شاخه|بسته|متر|دست)\s*$/)
-      || normText(line).match(/(?:تعداد|مقدار)\s*[:：-]?\s*(\d+(?:[.,]\d+)?)/);
+   const rawNorm=normText(line);
+   // Accept quantity at either the beginning or the end of a line.
+   const qMatch=rawNorm.match(/(\d+(?:[.,]\d+)?)\s*(?:عدد|شاخه|بسته|متر|دست)\s*$/)
+      || rawNorm.match(/^\s*(\d+(?:[.,]\d+)?)\s*(?:عدد|شاخه|بسته|متر|دست)\s*/)
+      || rawNorm.match(/(?:تعداد|مقدار)\s*[:：-]?\s*(\d+(?:[.,]\d+)?)/);
    const quantity=Math.max(1,Number(String(qMatch?.[1]||'1').replace(',','.'))||1);
-   const qtyNumber=qMatch?.[1];
-   const matchTokens=lineTokens.filter(t=>t!==qtyNumber && !/^(عدد|شاخه|بسته|متر|دست|تعداد|مقدار)$/.test(t));
-   const msgSet=new Set(matchTokens);
+   // Remove the detected quantity phrase before comparing fitting names and sizes.
+   let matchSource=rawNorm;
+   if(qMatch) matchSource=rawNorm.replace(qMatch[0],' ');
+   matchSource=matchSource.replace(/\b(?:تعداد|مقدار)\b/g,' ');
+   const normalized=clean(matchSource),lineTokens=toks(matchSource),lineSet=new Set(lineTokens);
+   const msgSet=new Set(lineTokens);
    let best=null,bestScore=0;
    itemData.forEach(d=>{
      const meaningful=d.tokens.filter(t=>t.length>1);
