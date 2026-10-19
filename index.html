@@ -242,32 +242,67 @@ function parseMessageLines(){
  const project=$('msgProject').value.trim(),raw=$('inventoryMessage').value.trim();
  if(!project){alert('اول نام پروژه یا انبار را وارد کن.');$('msgProject').focus();return}
  if(!raw){alert('متن پیام مهندس را وارد کن.');return}
- const lines=raw.split(/\n+/).map(x=>x.replace(/^\s*[-•*▪]+\s*/,'').trim()).filter(Boolean);
- const items=catalog.slice().sort((a,b)=>normText(b.name).length-normText(a.name).length);
+ const lines=raw.split(/\\n+/).map(x=>x.replace(/^\\s*[-•*▪]+\\s*/,'').trim()).filter(Boolean);
+ const items=catalog.slice();
+ const normalizeForMatch=v=>{
+   let t=normText(v)
+    .replace(/×|✕|✖/g,' x ')
+    .replace(/درجه/g,' ')
+    .replace(/اینچ/g,' ')
+    .replace(/کوپلی/g,' ')
+    .replace(/مساوی/g,' ')
+    .replace(/\\b(?:عدد|تعداد|مقدار|شاخه|بسته|متر|دست)\\b/g,' ')
+    .replace(/\\b(?:و|به)\\b/g,' ')
+    .replace(/\\s+/g,' ').trim();
+   // Make fraction/size punctuation and common word order differences less important.
+   t=t.replace(/(\\d+)\\s*[x]\\s*(\\d+)\\s*[x]\\s*(\\d+)/g,'$1 $2 $3');
+   return t;
+ };
+ const tokensFor=v=>normalizeForMatch(v).split(' ').filter(Boolean);
+ const aliases=t=>t
+   .replace(/سه راه/g,'سه‌راه').replace(/سه‌راه/g,'سه‌راه')
+   .replace(/زانو ۹۰/g,'زانو ۹۰').replace(/زانو ۴۵/g,'زانو ۴۵')
+   .replace(/روپیچ توپیچ/g,'روپیچ توپیچ');
+ const itemData=items.map(x=>({item:x,raw:normalizeForMatch(x.name),tokens:tokensFor(x.name)}));
  messageRows=lines.map((line,i)=>{
-   const nline=normText(line);let match=items.find(x=>{const nn=normText(x.name);return nn.length>=3&&(' '+nline+' ').includes(' '+nn+' ')});
-   if(!match){
-     const tokens=nline.split(' ').filter(t=>t.length>1&&!/^\d+$/.test(t));
-     let best=null,score=0;
-     items.forEach(x=>{const xt=normText(x.name).split(' ').filter(t=>t.length>1&&!/^\d+$/.test(t));if(!xt.length)return;const hit=xt.filter(t=>tokens.includes(t)).length;const sc=hit/Math.max(xt.length,tokens.length);if(sc>score){score=sc;best=x}});
-     if(score>=0.62)match=best;
-   }
-   let qty=1;
+   const nl=normalizeForMatch(line);
+   const lt=tokensFor(line);
+   const lset=new Set(lt);
+   let best=null,bestScore=0;
+   itemData.forEach(d=>{
+     if(!d.tokens.length)return;
+     const meaningful=d.tokens.filter(t=>t.length>1);
+     const hits=meaningful.filter(t=>lset.has(t)).length;
+     const coverage=hits/Math.max(1,meaningful.length);
+     const uniqueLine=new Set(lt);
+     const precision=hits/Math.max(1,uniqueLine.size);
+     // Strongly reward all identifying words and sizes matching; tolerate extra spaces,
+     // reordered words, omitted words such as "کوپلی", and missing degree labels.
+     let score=coverage*0.78+precision*0.22;
+     const itemWords=meaningful.filter(t=>/[آ-ی]/.test(t));
+     const wordHits=itemWords.filter(t=>lset.has(t)).length;
+     if(itemWords.length && wordHits===0) score=0;
+     if(score>bestScore){bestScore=score;best=d.item;}
+   });
+   // Exact normalized phrase matching wins, otherwise require enough identifying tokens.
+   const exact=itemData.find(d=>d.raw.length>2&&((' '+nl+' ').includes(' '+d.raw+' ')));
+   let match=exact?exact:(bestScore>=0.58?best:null);
+   // If a common fitting name is present but the line contains different size numbers,
+   // keep the match only when at least one size token from the catalog is present.
    if(match){
-     const nn=normText(match.name),pos=nline.indexOf(nn);
-     const before=pos>=0?nline.slice(0,pos):nline;
-     const after=pos>=0?nline.slice(pos+nn.length):'';
-     const preNums=[...before.matchAll(/\d+(?:[.,]\d+)?/g)];
-     const postNums=[...after.matchAll(/\d+(?:[.,]\d+)?/g)];
-     const explicit=line.match(/(?:تعداد|عدد|مقدار|×|x)\s*[:：-]?\s*(\d+(?:[.,]\d+)?)/i);
-     const leading=line.match(/^\s*(\d+(?:[.,]\d+)?)(?=\s|عدد|شاخه|بسته|متر)/);
-     let q=explicit?.[1]||leading?.[1]||postNums[0]?.[0]||preNums[preNums.length-1]?.[0];
-     if(q)qty=Math.max(1,Number(q.replace(',','.'))||1);
-   }else{
-     const explicit=line.match(/(?:تعداد|عدد|مقدار|×|x)\s*[:：-]?\s*(\d+(?:[.,]\d+)?)/i);
-     const leading=line.match(/^\s*(\d+(?:[.,]\d+)?)(?=\s|عدد|شاخه|بسته|متر)/);
-     const q=explicit?.[1]||leading?.[1];if(q)qty=Math.max(1,Number(q.replace(',','.'))||1);
+     const d=itemData.find(x=>x.item===match);
+     const numeric=d.tokens.filter(t=>/^\\d+$/.test(t));
+     if(numeric.length && !numeric.some(t=>lset.has(t)) && bestScore<0.9) match=null;
    }
+   // Quantity is normally the last number before a unit or at the end of the line.
+   // This handles wide spacing and Persian/Arabic digits after normalization.
+   const normLine=normText(line);
+   const unitQty=[...normLine.matchAll(/(\\d+(?:[.,]\\d+)?)\\s*(?:عدد|شاخه|بسته|متر|دست)\\b/g)];
+   const explicitQty=[...normLine.matchAll(/(?:تعداد|مقدار)\\s*[:：-]?\\s*(\\d+(?:[.,]\\d+)?)/g)];
+   const trailing=[...normLine.matchAll(/(?:^|\\s)(\\d+(?:[.,]\\d+)?)\\s*$/g)];
+   let q=unitQty.length?unitQty[unitQty.length-1][1]:explicitQty.length?explicitQty[explicitQty.length-1][1]:trailing.length?trailing[trailing.length-1][1]:null;
+   // For messages ending like "۱۰ عدد", unit parsing above is preferred over size numbers.
+   const qty=Math.max(1,Number(String(q||'1').replace(',','.'))||1);
    return {line,cat:match?.cat||cats[0],fit:match?.name||'',qty,unit:'عدد',matched:!!match,index:i};
  });
  renderMessagePreview();
