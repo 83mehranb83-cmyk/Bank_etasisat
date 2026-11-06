@@ -66,6 +66,31 @@ body.dark .stat,body.dark .panel{background:#1c2719;border-color:#35452d}
 body.dark input,body.dark select,body.dark .item,body.dark .project,body.dark .category,body.dark .empty{background:#253321;color:var(--ink);border-color:#3b4d32}
 body.dark .bottomnav,body.dark .cartbar{background:#1c2719;border-color:#35452d}
 
+
+/* Temporary pink appearance: active only on 2026-11-06 in Asia/Tehran */
+body.pink-day{--g:#a83f70;--g2:#c45c8b;--m:#d77ba4;--bg:#f2dce7;--paper:#f8eaf1;--line:#e4bfd0;--ink:#492b3a;--muted:#8b6578;--gold:#c5a0ad;--soft:#f0d3e1;--shadow:0 8px 22px #71334e18;background:linear-gradient(180deg,#f4e2eb 0%,#f0d9e5 50%,#f5e5ed 100%);color:var(--ink)}
+body.pink-day .top{background:linear-gradient(125deg,#71304e,#a83f70 58%,#cb7098);border-bottom-color:#e8b7cc}
+body.pink-day .stat,body.pink-day .panel{background:#f8eaf1;border-color:#e4bfd0}
+body.pink-day input,body.pink-day select{background:#fff3f8;border-color:#e2bfd0;color:#492b3a}
+body.pink-day .item,body.pink-day .project,body.pink-day .category{background:#f5e2eb;border-color:#e4bfd0;color:#492b3a}
+body.pink-day .tab{background:#efd2e0;color:#71304e}
+body.pink-day .tab.active,body.pink-day .primary,body.pink-day .sizechip.active{background:linear-gradient(135deg,#96375f,#c45c8b);color:#fff}
+body.pink-day .secondary,body.pink-day .pill,body.pink-day .quickfilters .sizechip{background:#f0d5e2;color:#783653;border-color:#e4bfd0}
+body.pink-day .gold{background:#f1dfc7;color:#6b4c36}
+body.pink-day .danger{background:#f5dadd;color:#963c4c}
+body.pink-day .empty{background:#f6e5ed;border-color:#dfb9cb;color:#8b6578}
+body.pink-day .bottomnav{background:#f8eaf1;border-color:#e4bfd0}
+body.pink-day .bottomnav .tab.active{background:#efd0df;color:#87385d}
+body.pink-day .cartbar{background:linear-gradient(120deg,#71304e,#a83f70);border-color:#d77ba4}
+body.dark.pink-day{--g:#f0a9c9;--g2:#d77ba4;--m:#e69abd;--bg:#21151d;--paper:#30202b;--line:#573447;--ink:#f7eaf1;--muted:#d1aabd;--soft:#442b3a;--shadow:0 8px 24px #0005;background:linear-gradient(180deg,#382332,#21151d 65%);color:var(--ink)}
+body.dark.pink-day .top{background:linear-gradient(125deg,#281722,#633047 58%,#8b4265)}
+body.dark.pink-day .stat,body.dark.pink-day .panel{background:#30202b;border-color:#573447}
+body.dark.pink-day input,body.dark.pink-day select,body.dark.pink-day .item,body.dark.pink-day .project,body.dark.pink-day .category,body.dark.pink-day .empty{background:#3a2633;color:#f7eaf1;border-color:#654056}
+body.dark.pink-day .tab,body.dark.pink-day .secondary,body.dark.pink-day .pill,body.dark.pink-day .sizechip{background:#442b3a;color:#f2dce7;border-color:#654056}
+body.dark.pink-day .tab.active,body.dark.pink-day .primary,body.dark.pink-day .sizechip.active{background:#8b4265;color:#fff}
+body.dark.pink-day .bottomnav{background:#30202b;border-color:#573447}
+body.dark.pink-day .bottomnav .tab.active{background:#442b3a;color:#f7eaf1}
+body.dark.pink-day .cartbar{background:linear-gradient(120deg,#633047,#8b4265)}
 </style></head><body>
 <header class="top"><div class="brand"><div class="mark">ب</div><div><h1>بانک اتصالات تأسیسات</h1><p>انتخاب دقیق، فهرست مرتب</p></div><button class="themebtn" id="themeToggle" aria-label="تغییر حالت روشن و تاریک">☾</button></div></header>
 <main class="wrap"><div class="stats"><div class="stat"><small>پروژه‌های ثبت‌شده</small><strong id="sp">۰</strong></div><div class="stat"><small>قلم ثبت‌شده</small><strong id="si">۰</strong></div><div class="stat"><small>اقلام خرید</small><strong id="sb">۰</strong></div></div>
@@ -369,4 +394,7 @@ $('addp').onclick=()=>{let name=$('pn').value.trim(),qty=Math.floor(+$('pq').val
 $('clearp').onclick=()=>{$('pn').value='';$('pl').value='';$('pq').value=1};$('pfilter').oninput=renderProjects;$('sq').oninput=renderSearch;$('sc').onchange=renderSearch;$('cq').oninput=()=>{sel='';showItems()};
 $('buyProject').onchange=()=>renderBuy();$('buyProject').oninput=()=>renderBuy();$('addb').onclick=()=>{let qty=Math.floor(+$('bq').value);if(qty<1||!qty){alert('تعداد را درست وارد کن.');return}addBuy($('bc').value,$('bf').value,qty,$('bu').value);$('bq').value=1};$('clearb').onclick=()=>{if(confirm('کل لیست خرید پاک شود؟')){buy=[];save();renderBuy()}};$('printb').onclick=()=>{if(!buy.length){alert('لیست خرید خالی است.');return}$('pdate').textContent=new Intl.DateTimeFormat('fa-IR').format(new Date());$('printfoot').classList.remove('hidden');window.print();setTimeout(()=>$('printfoot').classList.add('hidden'),1000)};
 stats();renderProjects();renderSearch();renderBuy();renderCatalog();sync('pc','pf');sync('bc','bf');
+
+// The temporary pink palette expires automatically after the Tehran calendar day.
+if(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tehran',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())==='2026-11-06')document.body.classList.add('pink-day');
 </script></body></html>
